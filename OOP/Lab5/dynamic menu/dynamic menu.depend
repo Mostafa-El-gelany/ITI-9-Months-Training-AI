@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1761322152 source:d:\iti\9 months training ai\oop\lab5\dynamic menu\main.cpp
+	<iostream>
+	<conio.h>
+	<windows.h>
+	<string.h>
+
