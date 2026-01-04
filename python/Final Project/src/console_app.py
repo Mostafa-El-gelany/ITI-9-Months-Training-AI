@@ -12,15 +12,16 @@ class ConsoleApp:
     def __init__(self):
         self.df = None
         self.num = 0
-        # Initialize logic modules once to save memory/time
+
         self.tc = TransactionCleaner()
         self.fb = FeatureBuilder()
         self.rs = RiskScorer()
         self.tf = TransactionFlagger()
         self.dm = DataManager()
         self.rg = ReportGenerator()
+        self.c = Colors()
 
-        # Menu configuration: (Label, Emoji)
+
         self.menu_items = [
             ("Load dataset", "📥"),
             ("Clean and validate data", "🧹"),
@@ -39,18 +40,18 @@ class ConsoleApp:
             ptr = self.manage_keys(ptr)
 
     def manage_flow(self, ptr):
-        """Validates if the user is allowed to proceed to the next step."""
         if ptr > self.num:
-            print(f"\n{Colors.RED}⚠️  Error: Sequence violation.{Colors.ENDC}")
-            print(f"{Colors.YELLOW}Please complete step {self.num + 1} first.{Colors.ENDC}")
+            print(f"\n{self.c.RED}⚠️  Error: Sequence violation.{self.c.ENDC}")
+            print(f"{self.c.YELLOW}Please complete step {self.num + 1} first.{self.c.ENDC}")
             msvcrt.getch()
             return 0
+        
         if ptr == 6:
             return 1
+        
         if ptr < self.num:
-            # Don't allow re-running previous steps.
-            print(f"\n{Colors.RED}⚠️  Error: Step already completed.{Colors.ENDC}")
-            print(f"{Colors.YELLOW}Please proceed to the next step.{Colors.ENDC}")
+            print(f"\n{self.c.RED}⚠️  Error: Step already completed.{self.c.ENDC}")
+            print(f"{self.c.YELLOW}Please proceed to the next step.{self.c.ENDC}")
             msvcrt.getch()
             return 0
         
@@ -59,7 +60,6 @@ class ConsoleApp:
     def manage_keys(self, ptr):
         key = msvcrt.getch()
         
-        # Handle Arrow Keys (Windows usually sends b'\xe0' then the direction)
         if key == b'\xe0': 
             key = msvcrt.getch()
             if key == b'H': ptr = (ptr - 1) % len(self.menu_items) # Up
@@ -76,8 +76,8 @@ class ConsoleApp:
         return ptr
 
     def execute_step(self, ptr):
-        """Logic execution for each menu item."""
-        print(f"\n{Colors.BOLD}{Colors.CYAN}🚀 Executing: {self.menu_items[ptr][0]}...{Colors.ENDC}")
+
+        print(f"\n{self.c.BOLD}{self.c.CYAN}🚀 Executing: {self.menu_items[ptr][0]}...{self.c.ENDC}")
         
         try:
             if ptr == 0:
@@ -95,41 +95,34 @@ class ConsoleApp:
             elif ptr == 6:
                 self.rg.display_summary()
 
-            # Increment progress if we just finished the 'next' logical step
             if ptr == self.num:
                 self.num += 1
 
-            print(f"\n{Colors.GREEN}✅ Success! Press any key to continue...{Colors.ENDC}")
+            print(f"\n{self.c.GREEN}✅ Success! Press any key to continue...{self.c.ENDC}")
         except Exception as e:
-            print(f"\n{Colors.RED}❌ An error occurred: {e}{Colors.ENDC}")
+            print(f"\n{self.c.RED}❌ An error occurred: {e}{self.c.ENDC}")
         
         msvcrt.getch()
 
     def display(self, ptr):
         os.system("cls")
-        print(f"{Colors.HEADER}{Colors.BOLD}══════════════════════════════════════════")
+        print(f"{self.c.HEADER}{self.c.BOLD}══════════════════════════════════════════")
         print(f"   🛡️  FRAUD DETECTION SYSTEM DASHBOARD   ")
-        print(f"══════════════════════════════════════════{Colors.ENDC}\n")
+        print(f"══════════════════════════════════════════{self.c.ENDC}\n")
 
         for i, (label, emoji) in enumerate(self.menu_items):
-            # Show completed items with a checkmark
+
             status_icon = "✅" if i < self.num else "  "
             if i == 7: status_icon = "  " # Exit doesn't need a check
 
             if i == ptr:
-                # Highlighted selection
-                print(f"{Colors.YELLOW}  👉 {Colors.BOLD}{Colors.BLUE}[ {emoji} {label.upper()} ]{Colors.ENDC}")
+                print(f"{self.c.YELLOW}  👉 {self.c.BOLD}{self.c.BLUE}[ {emoji} {label.upper()} ]{self.c.ENDC}")
             else:
-                # Regular items
-                # Dim the items that aren't 'unlocked' yet
+
                 if i > self.num and i != 7:
-                    print(f"     {status_icon} {Colors.RED}🔒 {label}")
+                    print(f"     {status_icon} {self.c.RED}🔒 {label}{self.c.ENDC}")
                 else:
                     print(f"     {status_icon} {emoji} {label}")
         
-        print(f"\n{Colors.CYAN}💡 Use Arrow Keys to navigate and Enter to select.{Colors.ENDC}")
-        print(f"{Colors.HEADER}──────────────────────────────────────────{Colors.ENDC}")
-
-if __name__ == "__main__":
-    app = ConsoleApp()
-    app.run()
+        print(f"\n{self.c.CYAN}💡 Use Arrow Keys to navigate and Enter to select.{self.c.ENDC}")
+        print(f"{self.c.HEADER}──────────────────────────────────────────{self.c.ENDC}")

@@ -1,15 +1,13 @@
 import pandas as pd
+from src.colors import Colors
 
 class ReportGenerator:
     def __init__(self):
-        self.CLR = {
-            "blue": "\033[94m", "green": "\033[92m", 
-            "warning": "\033[93m", "fail": "\033[91m", "bold": "\033[1m", "end": "\033[0m"
-        }
+        self.c = Colors()
 
     def generate_report(self, df):
         """Main orchestrator function."""
-        print(f"{self.CLR['bold']}{self.CLR['blue']}🚀 Starting High-Risk Analysis...{self.CLR['end']}")
+        print(f"{self.c.BOLD}{self.c.BLUE}🚀 Starting High-Risk Analysis...{self.c.ENDC}")
         
         flagged_tx = self._filter_transactions(df)
         flagged_users = self._profile_users(flagged_tx)
@@ -18,9 +16,14 @@ class ReportGenerator:
         self._save_csv_files(flagged_tx, flagged_users)
         self._generate_fancy_txt(flagged_tx, flagged_users)
         
-        print(f"{self.CLR['green']}✨ All reports generated successfully!{self.CLR['end']}")
+        print(f"{self.c.GREEN}✨ All reports generated successfully!{self.c.ENDC}")
         return flagged_users
-
+    
+    def get_user_type(self, types):
+        unique_types = set(types)
+        if len(unique_types) > 1: return 'both 🔄'
+        return 'sender 📤' if 'sender' in unique_types else 'receiver 📥'
+    
     def _filter_transactions(self, df):
         """Filters the main dataframe for suspicious activities."""
         return df[df['transactionRisk'].isin(['High', 'Critical'])].copy()
@@ -37,15 +40,10 @@ class ReportGenerator:
 
         combined = pd.concat([senders, receivers], ignore_index=True)
 
-        def get_user_type(types):
-            unique_types = set(types)
-            if len(unique_types) > 1: return 'both 🔄'
-            return 'sender 📤' if 'sender' in unique_types else 'receiver 📥'
-
         user_profiles = combined.groupby('UserID').agg({
             'RiskScore': 'max',
             'Amount': ['sum', 'count'],
-            'UserType': get_user_type
+            'UserType': self.get_user_type
         }).reset_index()
 
         user_profiles.columns = ['UserID', 'RiskScore', 'TotalVolume', 'TxCount', 'UserType']
