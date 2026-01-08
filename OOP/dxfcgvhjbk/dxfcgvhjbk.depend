@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1767358020 source:d:\iti\9 months training ai\oop\dxfcgvhjbk\main.cpp
+1767806640 source:d:\iti\9 months training ai\oop\dxfcgvhjbk\main.cpp
+	<iostream>
 	<bits/stdc++.h>
-	<unordered_map>
 
